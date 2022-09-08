@@ -1,41 +1,36 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import styles from './Searchbar.module.css'
 import { ImSearch } from 'react-icons/im'
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+export default function Searchbar({ onSubmit }) {
+  const [imageItems, setImageItems] = useState('');
+  const [prevImagesItems, setPrevImagesItems] = useState('');
 
-export default class Searchbar extends Component {
-  state = {
-    imageItems: '',
-    prevImagesItems: '',
-  }
-
-  handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (this.state.imageItems.trim() === '') {
+    if (imageItems.trim() === '') {
       toast.error('Please enter a request');
       return;
-    };
+    }
 
-    if (this.state.imageItems.trim() !== this.state.prevImagesItems) {
-      this.setState({ prevImagesItems: this.state.imageItems });
-      this.props.onSubmit(this.state.imageItems);
-      this.setState({ imageItems: '' });
-    } else if (this.state.imageItems.trim() === this.state.prevImagesItems) {
+    if (imageItems.trim() !== prevImagesItems) {
+      setPrevImagesItems(imageItems);
+      onSubmit(imageItems);
+      setImageItems('');
+    } else if (imageItems.trim() === prevImagesItems) {
       toast.info('Please enter another request. This request is already shown');
     }
+  };
+
+  const handleNameChange = event => {
+    setImageItems(event.currentTarget.value.toLowerCase());
   }
 
-  handleNameChange = event => {
-    this.setState({ imageItems: event.currentTarget.value.toLowerCase() });
-  }
-
-  render() {
     return (
       <header className={styles.Searchbar}>
-        <form onSubmit={this.handleSubmit} className={styles.SearchForm}>
+        <form onSubmit={handleSubmit} className={styles.SearchForm}>
           <button type="submit" className={styles.SearchFormButton}>
             <ImSearch />
             <span className={styles.SearchFormButtonLabel}>Search</span>
@@ -47,13 +42,12 @@ export default class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={this.state.imageItems}
-            onChange={ this.handleNameChange}
+            value={imageItems}
+            onChange={handleNameChange}
           />
         </form>
       </header>
     );
-  };
 };
 
 Searchbar.propTypes = {
